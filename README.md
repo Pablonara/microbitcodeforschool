@@ -1,4 +1,4 @@
-# microbit codefor school rock paper scissors/rock paper scissors lizard spock assignment
+# microbit code for school rock paper scissors/rock paper scissors lizard spock assignment
 microbit code for school 
 
 ## Do note!
