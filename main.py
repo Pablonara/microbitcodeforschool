@@ -1,4 +1,4 @@
-# lite version to avoid mem issues
+# lite version to avoid mem issues hopefully
 from microbit import *
 import radio, os, random
 def read():
@@ -85,9 +85,6 @@ def sendEncrypt(message, key): #just implemented simple XOR encryption for fun
 
 def recieveEncrypt(key):
     while True:
-        if button_b.was_pressed():
-            breakfromloop = True
-            return
         a = radio.receive()
         if a:
             return a
@@ -269,28 +266,35 @@ else:
     eliminated = False
     poll = False
     playerid = -1
-    a = recieveEncrypt(key)
-    if a == 'join':
-        sendEncrypt('accepted', key)
-        sleep(20)
-        playerid = recieveEncrypt(key)
-    if a == 'True':
-        poll = True
-    if a == 'starting':
-        while not eliminated:
-            a = recieveEncrypt(key)
-            if a == 'p'+str(playerid)+'turn':
-                sendEncrypt(str(getrpschoice(poll)), key)
-            if a == 'p'+str(playerid)+'eliminated':
-                print('Player eliminated!')
-                a = ''
-            elif str(a).endswith('eliminated'):
-                a = str(a).replace('eliminated', '')
-                print('Player '+a[1:]+' eliminated!')
-                a = ''
-            elif str(a) == 'tie':
-                print("Tie! No one was eliminated.")
-            elif str(a).startswith('win'):
-                winner = int(str(a)[3:])
-                print("Winner! "+str("Winner! Player#"+str(winner+1)) if winner>=0 else ("Winner! Ai#"+str(winner)))
-
+    while True:
+        a = recieveEncrypt(key)
+        if a == 'join':
+            sendEncrypt('accepted', key)
+            sleep(20)
+            playerid = recieveEncrypt(key)
+        if a == 'True':
+            poll = True
+        if a == 'starting':
+            print('game starting....')
+            while not eliminated:
+                a = recieveEncrypt(key)
+                if a == 'p'+str(playerid)+'turn':
+                    print("Choose your option")
+                    b = str(getrpschoice(poll))
+                    sendEncrypt(b, key)
+                if a == 'p'+str(playerid)+'eliminated':
+                    print('Player eliminated!')
+                    eliminated = True
+                    a = ''
+                elif str(a).endswith('eliminated'):
+                    a = str(a).replace('eliminated', '')
+                    print('Player '+a[1:]+' eliminated!')
+                    a = ''
+                elif str(a) == 'tie':
+                    print("Tie! No one was eliminated.")
+                elif str(a).startswith('win'):
+                    winner = int(str(a)[3:])
+                    print("Winner! "+str("Winner! Player#"+str(winner+1)) if winner>=0 else ("Winner! Ai#"+str(winner)))
+        if eliminated:
+            break
+    
