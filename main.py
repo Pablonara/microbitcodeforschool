@@ -1,4 +1,4 @@
-# lite version to avoid mem issues hopefully
+# lite version to avoid mem issues
 from microbit import *
 import radio, os, random
 def read():
@@ -8,7 +8,7 @@ def write(text):
     file = open("foo.txt", "w")
     file.write(text)
     file.close()
-    
+
 def getButton():
     while True:
         if button_a.was_pressed():
@@ -85,6 +85,9 @@ def sendEncrypt(message, key): #just implemented simple XOR encryption for fun
 
 def recieveEncrypt(key):
     while True:
+        if button_b.was_pressed():
+            breakfromloop = True
+            return
         a = radio.receive()
         if a:
             return a
@@ -105,7 +108,7 @@ def count():
             count += 1
             print(count)
             display.show(count)
-            
+
 hostmode = ''
 input1 = ''
 radio.on()
@@ -118,6 +121,8 @@ rpslizspock = False
 print("Press A to host game, B to not host game")
 input1 = getButton()
 playerid = 0
+lastrecieved = ''
+eliminated = False
 if input1 == 'a':
     hostmode = 'host'
     radio.send("join")
@@ -148,9 +153,9 @@ if hostmode == 'host':
         sendEncrypt('True', key)
     sendEncrypt('starting', key)
     sleep(300)
-    
+
     for i in range(1, (len(connected)+1)):
-        if i == 1:
+        if i == 1 and not eliminated:
             a = getrpschoice(False)
             allchoices.append((a, playerid))
             for i in range(ainum):
@@ -158,45 +163,59 @@ if hostmode == 'host':
         else:
             sendEncrypt('p'+str(connected[i-1])+'turn', key)
             choice = recieveEncrypt(key)
+            while choice != 'rock' and (choice != 'scissors') and (choice != 'paper') and (choice != 'lizard') and (choice != 'spock'):
+                choice = recieveEncrypt(key)    
+            allchoices.append((choice, i))
     while len(allchoices) != 1:
         for i in range(len(allchoices)):
             if rpslizspock and len(allchoices)>1:
+                print(str(allchoices))
                 choice, id = allchoices.pop(random.randint(0, len(allchoices)-1))
                 choice1, id1 = allchoices.pop(random.randint(0, len(allchoices)-1))
                 indexer = ['rock', 'spock', 'paper', 'lizard', 'scissors']
-                print(choice+str(id))
-                print(choice1+str(id1))
                 choice = indexer.index(choice.lower())
                 choices1 = indexer.index(choice1.lower())
                 difference = (choice - choices1) % 5
-                if difference in [1, 2]: #player1 win
-                    sendEncrypt(('p'+str(id1)+'eliminated') if id1>=0 else ('ai'+str(id1*-1)+'eliminated'), key)
-                    if id1 == 0:
-                        choice1 = getrpschoice(False)
+                if difference in [3, 4]: #player1 win
+                    sendEncrypt(('p'+str(id)+'eliminated') if id1>=0 else ('ai'+str(id1*-1)+'eliminated'), key)
+                    if id == 0:
+                        eliminated = True
+                    if id1 == 0 and not eliminated:
+                        choice1 = getrpschoice(True)
                         allchoices.append((choice1, id1))
                     elif id1>0:
                         sendEncrypt('p'+str(id1)+'turn', key)
-                        allchoices.append((recieveEncrypt(key), id1))
+                        choice1 == ''
+                        while choice1 != 'rock' and (choice != 'scissors') and (choice != 'paper') and (choice != 'lizard') and (choice != 'spock'):
+                            choice1 = recieveEncrypt(key)
+                        allchoices.append((choice1, id1))
                     elif id1<0:
                         allchoices.append((random.choice(['rock', 'spock', 'paper', 'lizard', 'scissors']) if rpslizspock==True else random.choice(['rock', 'paper', 'scissors']), id1))
-                elif difference in [3, 4]: #player0 win
-                    sendEncrypt(('p'+str(id)) if id>=0 else ('ai'+str(id*-1)), key)
-                    if id == 0:
-                        choice = getrpschoice(False)
+                elif difference in [1, 2]: #player0 win
+                    sendEncrypt(('p'+str(id1)+'eliminated') if id>=0 else ('ai'+str(id*-1)), key)
+                    if id == 0 and not eliminated:
+                        choice = getrpschoice(True)
                         allchoices.append((choice, id))
                     elif id>0:
                         sendEncrypt('p'+str(id)+'turn', key)
-                        allchoices.append((recieveEncrypt(key), id))
+                        choice == ''
+                        while choice != 'rock' and (choice != 'scissors') and (choice != 'paper') and (choice != 'lizard') and (choice != 'spock'):
+                            choice = recieveEncrypt(key)
+                        allchoices.append((choice, id))
                     elif id<0:
                         allchoices.append((random.choice(['rock', 'spock', 'paper', 'lizard', 'scissors']) if rpslizspock==True else random.choice(['rock', 'paper', 'scissors']), id))
                 else: #tie
                     sendEncrypt('tie', key)
+                    print('tie')
                     if id == 0:
                         choice = getrpschoice(False)
                         allchoices.append((choice, id))
                     elif id>0:
                         sendEncrypt('p'+str(id)+'turn', key)
-                        allchoices.append((recieveEncrypt(key), id))
+                        choice == ''
+                        while choice != 'rock' and (choice != 'scissors') and (choice != 'paper') and (choice != 'lizard') and (choice != 'spock'):
+                            choice = recieveEncrypt(key)
+                        allchoices.append((choice, id))
                     elif id<0:
                         allchoices.append((random.choice(['rock', 'spock', 'paper', 'lizard', 'scissors']) if rpslizspock==True else random.choice(['rock', 'paper', 'scissors']), id))
                         sendEncrypt(('p'+str(id1)+'eliminated') if id1>=0 else ('ai'+str(id1*-1)+'eliminated'), key)
@@ -205,47 +224,58 @@ if hostmode == 'host':
                         allchoices.append((choice1, id1))
                     elif id1>0:
                         sendEncrypt('p'+str(id1)+'turn', key)
-                        allchoices.append((recieveEncrypt(key), id1))
+                        choice1 == ''
+                        while choice1 != 'rock' and (choice != 'scissors') and (choice != 'paper') and (choice != 'lizard') and (choice != 'spock'):
+                            choice1 = recieveEncrypt(key)
+                        allchoices.append((choice1, id1))
                     elif id1<0:
                         allchoices.append((random.choice(['rock', 'spock', 'paper', 'lizard', 'scissors']) if rpslizspock==True else random.choice(['rock', 'paper', 'scissors']), id1))
                     allchoices.append((choice1, id1))
             elif (not rpslizspock) and len(allchoices)>1:
+                print(str(allchoices))
                 choice, id = allchoices.pop(random.randint(0, len(allchoices)-1))
                 choice1, id1 = allchoices.pop(random.randint(0, len(allchoices)-1))
-                print(choice+str(id))
-                print(choice1+str(id1))
                 indexer = ['rock', 'spock', 'paper', 'lizard', 'scissors']
                 choice = indexer.index(choice.lower())
                 choices1 = indexer.index(choice1.lower())
                 difference = (choice - choices1) % 3
-                if difference in [1]: #player1 win
+                if difference in [2]: #player1 win
                     sendEncrypt(('p'+str(id1)+'eliminated') if id1>=0 else ('ai'+str(id1*-1)+'eliminated'), key)
                     if id1 == 0:
                         choice1 = getrpschoice(False)
                         allchoices.append((choice1, id1))
                     elif id1>0:
-                        sendEncrypt('p'+str(id1)+'turn', key)
-                        allchoices.append((recieveEncrypt(key), id1))
+                        choice1 == ''
+                        while choice1 != 'rock' and (choice != 'scissors') and (choice != 'paper') and (choice != 'lizard') and (choice != 'spock'):
+                            choice1 = recieveEncrypt(key)
+                        allchoices.append((choice1, id1))
                     elif id1<0:
                         allchoices.append((random.choice(['rock', 'spock', 'paper', 'lizard', 'scissors']) if rpslizspock==True else random.choice(['rock', 'paper', 'scissors']), id1))
-                elif difference in [2]: #player0 win
+                elif difference in [1]: #player0 win
                     sendEncrypt(('p'+str(id)) if id>=0 else ('ai'+str(id*-1)), key)
                     if id == 0:
                         choice = getrpschoice(False)
                         allchoices.append((choice, id))
                     elif id>0:
                         sendEncrypt('p'+str(id)+'turn', key)
-                        allchoices.append((recieveEncrypt(key), id))
+                        choice == ''
+                        while choice != 'rock' and (choice != 'scissors') and (choice != 'paper') and (choice != 'lizard') and (choice != 'spock'):
+                            choice = recieveEncrypt(key)
+                        allchoices.append((choice, id))
                     elif id<0:
                         allchoices.append((random.choice(['rock', 'spock', 'paper', 'lizard', 'scissors']) if rpslizspock==True else random.choice(['rock', 'paper', 'scissors']), id))
                 else: #tie
                     sendEncrypt('tie', key)
+                    print('tie')
                     if id == 0:
                         choice = getrpschoice(False)
                         allchoices.append((choice, id))
                     elif id>0:
                         sendEncrypt('p'+str(id)+'turn', key)
-                        allchoices.append((recieveEncrypt(key), id))
+                        choice == ''
+                        while choice != 'rock' and (choice != 'scissors') and (choice != 'paper') and (choice != 'lizard') and (choice != 'spock'):
+                            choice = recieveEncrypt(key)
+                        allchoices.append((choice, id))
                     elif id<0:
                         allchoices.append((random.choice(['rock', 'spock', 'paper', 'lizard', 'scissors']) if rpslizspock==True else random.choice(['rock', 'paper', 'scissors']), id))
                         sendEncrypt(('p'+str(id1)+'eliminated') if id1>=0 else ('ai'+str(id1*-1)+'eliminated'), key)
@@ -254,19 +284,21 @@ if hostmode == 'host':
                         allchoices.append((choice1, id1))
                     elif id1>0:
                         sendEncrypt('p'+str(id1)+'turn', key)
-                        allchoices.append((recieveEncrypt(key), id1))
+                        choice1 == ''
+                        while choice1 != 'rock' and (choice != 'scissors') and (choice != 'paper') and (choice != 'lizard') and (choice != 'spock'):
+                            choice1 = recieveEncrypt(key)
+                        allchoices.append((choice1, id1))
                     elif id1<0:
                         allchoices.append((random.choice(['rock', 'spock', 'paper', 'lizard', 'scissors']) if rpslizspock==True else random.choice(['rock', 'paper', 'scissors']), id1))
-                    allchoices.append((choice1, id1))
     winner = allchoices[0][1]
-    sendEncrypt('win'+str(winner), key)
+    sendEncrypt('win'+str(winner+1), key)
     print(("Winner! Player#"+str(winner+1)) if winner>=0 else ("Winner! Ai#"+str(winner)))
-    
+
 else:
-    eliminated = False
-    poll = False
-    playerid = -1
     while True:
+        eliminated = False
+        poll = False
+        playerid = -1
         a = recieveEncrypt(key)
         if a == 'join':
             sendEncrypt('accepted', key)
@@ -275,16 +307,12 @@ else:
         if a == 'True':
             poll = True
         if a == 'starting':
-            print('game starting....')
             while not eliminated:
                 a = recieveEncrypt(key)
                 if a == 'p'+str(playerid)+'turn':
-                    print("Choose your option")
-                    b = str(getrpschoice(poll))
-                    sendEncrypt(b, key)
+                    sendEncrypt(str(getrpschoice(poll)), key)
                 if a == 'p'+str(playerid)+'eliminated':
                     print('Player eliminated!')
-                    eliminated = True
                     a = ''
                 elif str(a).endswith('eliminated'):
                     a = str(a).replace('eliminated', '')
@@ -294,7 +322,4 @@ else:
                     print("Tie! No one was eliminated.")
                 elif str(a).startswith('win'):
                     winner = int(str(a)[3:])
-                    print("Winner! "+str("Winner! Player#"+str(winner+1)) if winner>=0 else ("Winner! Ai#"+str(winner)))
-        if eliminated:
-            break
-    
+                    print("Winner! "+str("Winner! Player#"+str(winner+1)) if winner>=0 else ("Winner! Ai#"+str(winner*-1)))
