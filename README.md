@@ -1,4 +1,4 @@
-# microbitcodeforschool
+# microbit codefor school rps/rpsls assignment
 microbit code for school aaaaaaaaaaaaa
 I used display.scroll instead of 
 pseudocode.md-pseudocode for the main code
