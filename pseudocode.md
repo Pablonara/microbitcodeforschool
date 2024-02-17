@@ -5,7 +5,67 @@
 - Import the `radio`, `os`, and `random` libraries.
 - Initialize variables for `score`, `choices` (list containing "rock", "paper", "scissors"), `hostmode`, `input1`, `connected` (list of connected users), `allchoices` (list of current player choices and player IDs), `rpslizspock` (flag for playing with or without lizard and spock), `playerid`, `poll` (flag for extended choices), `breakfromloop`, and `ainum` (number of AI players).
 
-**Game Mode Selection:**
+**Functions**
+
+read()
+
+Opens a file named "foo.txt" for reading, reads the entire contents, closes the file, and returns the content.
+
+write(text)
+
+Opens a file named "foo.txt" for writing, writes the given text to the file, and closes the file.
+
+getButton()
+
+Continuously checks for button presses:
+
+* If button A is pressed, returns 'a'.
+* If button B is pressed, returns 'b'.
+* Otherwise, wait 100 milliseconds and check again.
+
+getButtonWithAB()
+
+Checks for button presses:
+
+* If both buttons A and B are pressed simultaneously, returns 'ab'.
+* If button A is pressed, returns 'a'.
+* If button B is pressed, returns 'b'.
+* Otherwise, wait 100 milliseconds and check again.
+
+
+
+getrpschoice(poll)
+
+Creates a list of image choices for rock, paper, scissors, and optionally lizard and Spock. Initializes a counter to 0. Displays the initial image on the micro:bit. Continuously checks for button presses:
+
+* If both buttons A and B are pressed simultaneously, returns the string representation of the current choice (e.g., "scissors").
+* If button A is pressed:
+    * If at the beginning of the list and not in poll mode, jumps to the end of the list.
+    * Otherwise, moves to the previous choice in the list.
+* If button B is pressed:
+    * If at the end of the list and not in poll mode, jumps to the beginning of the list.
+    * Otherwise, moves to the next choice in the list.
+Display the updated image on display.
+
+sendEncrypt(message, key)
+
+* send a message through radio
+
+recieveEncrypt(key)
+
+Continuously checks for incoming radio messages:
+
+* If a message is received through radio, return it.
+
+count()
+
+Initializes a counter to 0. Continuously check for button presses:
+
+* If both buttons A and B are pressed simultaneously, return the current count.
+* If button A is pressed and the count is greater than 0, decrease the count and display it.
+* If button B is pressed and the count is less than 9, increase the count and display it.
+
+**Server-Client Selection:**
 
 - Ask the user to press button A to host a game or button B to join a game.
 - Store the button press as `input1`.
