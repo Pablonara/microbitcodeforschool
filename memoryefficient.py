@@ -48,7 +48,6 @@ key='dWyNlXY7RuYIAqg8N2K3A'
 def sendEncrypt(message,key):radio.send(message)
 def recieveEncrypt(key):
 	while _D:
-		if button_b.was_pressed():breakfromloop=_D;return
 		a=radio.receive()
 		if a:return a
 def count():
@@ -132,14 +131,18 @@ if hostmode=='host':
 					allchoices.append((choice1,id1))
 	winner=allchoices[0][1];sendEncrypt('win'+str(winner),key);print(_P+str(winner+1)if winner>=0 else _Q+str(winner))
 else:
-	eliminated=_F;poll=_F;playerid=-1;a=recieveEncrypt(key)
-	if a=='join':sendEncrypt(_N,key);sleep(20);playerid=recieveEncrypt(key)
-	if a=='True':poll=_D
-	if a==_O:
-		while not eliminated:
-			a=recieveEncrypt(key)
-			if a==_E+str(playerid)+_J:sendEncrypt(str(getrpschoice(poll)),key)
-			if a==_E+str(playerid)+_I:print('Player eliminated!');a=''
-			elif str(a).endswith(_I):a=str(a).replace(_I,'');print('Player '+a[1:]+' eliminated!');a=''
-			elif str(a)==_L:print('Tie! No one was eliminated.')
-			elif str(a).startswith('win'):winner=int(str(a)[3:]);print('Winner! '+str(_P+str(winner+1))if winner>=0 else _Q+str(winner))
+	eliminated=_F;poll=_F;playerid=-1
+	while _D:
+		a=recieveEncrypt(key)
+		if a=='join':sendEncrypt(_N,key);sleep(20);playerid=recieveEncrypt(key)
+		if a=='True':poll=_D
+		if a==_O:
+			print('game starting....')
+			while not eliminated:
+				a=recieveEncrypt(key)
+				if a==_E+str(playerid)+_J:print('Choose your option');b=str(getrpschoice(poll));sendEncrypt(b,key)
+				if a==_E+str(playerid)+_I:print('Player eliminated!');eliminated=_D;a=''
+				elif str(a).endswith(_I):a=str(a).replace(_I,'');print('Player '+a[1:]+' eliminated!');a=''
+				elif str(a)==_L:print('Tie! No one was eliminated.')
+				elif str(a).startswith('win'):winner=int(str(a)[3:]);print('Winner! '+str(_P+str(winner+1))if winner>=0 else _Q+str(winner))
+		if eliminated:break
