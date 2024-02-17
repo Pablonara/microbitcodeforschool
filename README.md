@@ -6,6 +6,10 @@ I used print() instead of display.scroll() - Much more easier to read. Microbit 
 
 ## File locations
 pseudocode.md-pseudocode for the main code
+
 main.py-readable code format, with print statements
+
 shortened.py- shortened code format- use if running into memory error
+
 extra.py-updated python file
+
