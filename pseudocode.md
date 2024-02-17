@@ -7,14 +7,6 @@
 
 **Functions**
 
-read()
-
-Opens a file named "foo.txt" for reading, reads the entire contents, closes the file, and returns the content.
-
-write(text)
-
-Opens a file named "foo.txt" for writing, writes the given text to the file, and closes the file.
-
 getButton()
 
 Continuously checks for button presses:
