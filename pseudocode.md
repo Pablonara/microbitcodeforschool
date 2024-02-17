@@ -11,8 +11,8 @@ getButton()
 
 Continuously checks for button presses:
 
-* If button A is pressed, returns 'a'.
-* If button B is pressed, returns 'b'.
+* If button A was pressed, returns 'a'.
+* If button B was pressed, returns 'b'.
 * Otherwise, wait 100 milliseconds and check again.
 
 getButtonWithAB()
@@ -20,8 +20,8 @@ getButtonWithAB()
 Checks for button presses:
 
 * If both buttons A and B are pressed simultaneously, returns 'ab'.
-* If button A is pressed, returns 'a'.
-* If button B is pressed, returns 'b'.
+* If button A was pressed, returns 'a'.
+* If button B was pressed, returns 'b'.
 * Otherwise, wait 100 milliseconds and check again.
 
 
@@ -31,17 +31,17 @@ getrpschoice(poll)
 Creates a list of image choices for rock, paper, scissors, and optionally lizard and Spock. Initializes a counter to 0. Displays the initial image on the micro:bit. Continuously checks for button presses:
 
 * If both buttons A and B are pressed simultaneously, returns the string representation of the current choice (e.g., "scissors").
-* If button A is pressed:
-    * If at the beginning of the list and not in poll mode, jumps to the end of the list.
+* If button A was pressed:
+    * If at the beginning of the list and not in poll mode, jumps to the end of the list. 
     * Otherwise, moves to the previous choice in the list.
-* If button B is pressed:
+* If button B was pressed:
     * If at the end of the list and not in poll mode, jumps to the beginning of the list.
     * Otherwise, moves to the next choice in the list.
 Display the updated image on display.
 
 sendEncrypt(message, key)
 
-* send a message through radio
+* send a message (var message) through radio
 
 recieveEncrypt(key)
 
