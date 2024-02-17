@@ -57,7 +57,7 @@ Initializes a counter to 0. Continuously check for button presses:
 * If button A is pressed and the count is greater than 0, decrease the count and display it.
 * If button B is pressed and the count is less than 9, increase the count and display it.
 
-**Server-Client Selection:**
+**Server-Client Selection (Host, Join mode)**
 
 - Ask the user to press button A to host a game or button B to join a game.
 - Store the button press as `input1`.
