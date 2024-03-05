@@ -6,7 +6,7 @@ I used print() instead of display.scroll() - Much more easier to read. Microbit 
 
 multiplayer connect with radio might not work, its kinda buggy for some reason
 ## File locations
-pseudocode.md-pseudocode for the main code
+pseudocode.md-pseudocode for the main code https://github.com/Pablonara/microbitcodeforschool/blob/main/pseudocode.md
 
 main.py-readable code format, with print statements
 
